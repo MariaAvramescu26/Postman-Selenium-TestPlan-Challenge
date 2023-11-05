@@ -1,0 +1,84 @@
+Feature: Reqres API Tests
+  As a QA engineer,
+  I want to test the Reqres API endpoints,
+  So that I can ensure the API functions correctly.
+
+  Background:
+    Given the Reqres API is accessible
+
+    Scenario: Create an User Endpoint
+      When a POST request is sent to the "/api/register" endpoint with the following data:
+        | username | email          | password  |
+        | hello    | hi@gmail.com   | passTest  |
+      Then the response should have a status code of 400 Bad Request
+      And the response should not have a status code of 200 Success
+      And the response should contain the expected error message "Note: Only defined users succeed registration"
+
+    Scenario: Create an User with Invalid Email
+      When a POST request is sent to the "/api/register" endpoint with invalid email:
+        | username | email         | password  |
+        | user1   | invalid_email  | pass123  |
+      Then the response should have a status code of 400 Bad Request
+      And the response should contain the error message "Note: Only defined users succeed registration"
+
+      Scenario: Create an User with Empty Username
+      When a POST request is sent to the "/api/register" endpoint with the following data:
+        | username | email          | password  |
+        |         | test@example.com | pass123  |
+      Then the response should have a status code of 400 Bad Request
+      And the response should contain the error message "Note: Only defined users succeed registration"
+
+    Scenario: Get Users Endpoint
+      When a GET request is sent to the "/api/users?page=3&per_page=2" endpoint
+      Then the response should have a status code of 200 OK
+      And the response should be in JSON format
+      And the response should contain 2 users (per_page=2)
+      And the response page number should be 3
+      And the id in the first object of data array should be 5
+
+      Scenario: Get Users with Invalid Page Number
+      When a GET request is sent to the "/api/users?page=invalid&per_page=2" endpoint
+      Then the response should have a status code of 400 Bad Request
+      And the response should contain an error message
+
+    Scenario: Update User Endpoint
+      When a PUT request is sent to the "/api/users/3" endpoint with the following data:
+        | email                |
+        | maria.wong@reqres.in |
+      Then the response should have a status code of 200 OK
+      And the response should contain the 'updatedAt' attribute
+      And the response should contain the 'email' attribute
+
+      Scenario: Update Non-Existent User
+      When a PUT request is sent to the "/api/users/100" endpoint with valid data:
+        | email               |
+        | updated@example.com |
+      Then the response should have a status code of 404 Not Found
+
+    Scenario: Update User with Invalid Email Format
+      When a PUT request is sent to the "/api/users/3" endpoint with an invalid email format:
+        | email            |
+        | invalid-email    |
+      Then the response should have a status code of 400 Bad Request
+      And the response should contain an error message
+
+    Scenario: Delete a User Endpoint
+      When a DELETE request is sent to the "/api/users/3" endpoint
+      Then the response should have a status code of 204 No Content
+      And the response body should be empty
+      And the response should not include the 'Content-Type' header
+
+    Scenario: Delete Non-Existent User
+      When a DELETE request is sent to the "/api/users/100" endpoint
+      Then the response should have a status code of 404 Not Found
+
+Test Environment:
+  - API base URL: https://reqres.in
+
+
+Feature: Reqres API Tests
+  As a QA engineer,
+  I want to test the Reqres API endpoints,
+  So that I can ensure the API functions correctly.
+
+ 
